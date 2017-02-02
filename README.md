@@ -5,7 +5,7 @@ Encrypted chat via terminal
 ```bash
 npm install -g crypto-chat
 ```
-You may have to use "sudo" if you're Linux
+You may have to use "sudo" if you're using Linux
 
 # Usage
 
