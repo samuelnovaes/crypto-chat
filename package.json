@@ -1,0 +1,35 @@
+{
+    "name": "crypto-chat",
+    "version": "1.0.3",
+    "description": "Client for Crypto Chat",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js -s"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/samuelnovaes/crypto-chat.git"
+    },
+    "keywords": [
+        "crypto",
+        "cypher",
+        "chat",
+        "messages",
+        "instant"
+    ],
+    "author": "Samuel Novaes",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/samuelnovaes/crypto-chat/issues"
+    },
+    "homepage": "https://github.com/samuelnovaes/crypto-chat#readme",
+    "dependencies": {
+        "blessed": "^0.1.81",
+        "socket.io": "^1.7.2",
+        "socket.io-client": "^1.7.2"
+    },
+    "bin": {
+        "crypto-chat": "index.js"
+    }
+}
