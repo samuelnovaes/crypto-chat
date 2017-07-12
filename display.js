@@ -1,13 +1,13 @@
 const blessed = require('blessed');
 
-module.exports = info=>{
+module.exports = info => {
 
     const events = {
-        onSubmit: function(msg){},
-        onPrivate: function(id, msg){}
+        onSubmit: function (msg) { },
+        onPrivate: function (id, msg) { }
     }
 
-    const screen = blessed.screen({smartCSR: true, log: "log.txt", dockBorders: true});
+    const screen = blessed.screen({ smartCSR: true, dockBorders: true });
     const program = blessed.program();
 
     const infoBox = blessed.box({
@@ -35,7 +35,7 @@ module.exports = info=>{
         scrollable: true,
         alwaysScroll: true,
         scrollbar: {
-            bg: "#008080"
+            bg: "blue"
         },
         border: {
             type: "line",
@@ -77,7 +77,7 @@ module.exports = info=>{
         alwaysScroll: true,
         bg: "black",
         scrollbar: {
-            bg: "#008080"
+            bg: "blue"
         },
         border: {
             type: "line",
@@ -86,81 +86,88 @@ module.exports = info=>{
         }
     });
 
-    screen.key('C-c', (ch, key)=>{
+    screen.key('C-c', (ch, key) => {
         process.exit(0);
     });
 
-    screen.on('keypress', ()=>{
+    screen.on('keypress', () => {
         screen.focusPush(messageInput);
     });
 
-    messageInput.key('up', ()=>{
+    messageInput.key('up', () => {
         messageView.scroll(-1);
         screen.render();
     });
 
-    messageInput.key('down', ()=>{
+    messageInput.key('down', () => {
         messageView.scroll(1);
         screen.render();
     });
 
-    messageInput.key('C-up', ()=>{
+    messageInput.key('C-up', () => {
         sidebar.scroll(-1);
         screen.render();
     });
 
-    messageInput.key('C-down', ()=>{
+    messageInput.key('C-down', () => {
         sidebar.scroll(1);
         screen.render();
     });
 
-    messageInput.key('enter', ()=>{
+    messageInput.key('enter', () => {
         let msg = messageInput.content.trim();
-        switch(msg){
+        switch (msg) {
             case "\\clear":
-            messageView.setContent("");
-            messageInput.clearValue();
-            screen.render();
-            break;
-            case "\\quit":
-            process.exit(0);
-            break;
-            case "\\hide":
-            sidebar.hide();
-            messageView.left = 0;
-            messageInput.left = 0;
-            messageInput.clearValue();
-            screen.render();
-            break;
-            case "\\show":
-            sidebar.show();
-            messageView.left = sidebar.width;
-            messageInput.left = sidebar.width;
-            messageInput.clearValue();
-            screen.render();
-            break;
-            case (msg.match(/^\\size-\d+$/) || {}).input:
-            msg.replace(/^\\size-(\d+)$/, m=>{
-                let size = parseInt(RegExp.$1);
-                sidebar.width = size;
-                messageView.left = size;
-                messageInput.left = size;
+                messageView.setContent("");
                 messageInput.clearValue();
                 screen.render();
-            });
-            break;
+                break;
+            case "\\quit":
+                process.exit(0);
+                break;
+            case "\\hide":
+                sidebar.hide();
+                messageView.left = 0;
+                messageInput.left = 0;
+                messageInput.clearValue();
+                screen.render();
+                break;
+            case "\\show":
+                sidebar.show();
+                messageView.left = sidebar.width;
+                messageInput.left = sidebar.width;
+                messageInput.clearValue();
+                screen.render();
+                break;
+            case (msg.match(/^\\size-\d+$/) || {}).input:
+                msg.replace(/^\\size-(\d+)$/, m => {
+                    let size = parseInt(RegExp.$1);
+                    sidebar.width = size;
+                    messageView.left = size;
+                    messageInput.left = size;
+                    messageInput.clearValue();
+                    screen.render();
+                });
+                break;
             case (msg.match(/^\\\d+ .*$/) || {}).input:
-            msg.replace(/^\\(\d+) (.*)$/, m=>{
-                events.onPrivate(parseInt(RegExp.$1), RegExp.$2);
-                messageInput.setValue(`\\${RegExp.$1} `);
-            });
-            break;
+                msg.replace(/^\\(\d+) (.*)$/, m => {
+                    events.onPrivate(parseInt(RegExp.$1), RegExp.$2);
+                    messageInput.setValue(`\\${RegExp.$1} `);
+                    screen.render();
+                });
+                break;
+            case (msg.match(/^\\\d+$/) || {}).input:
+                msg.replace(/^\\(\d+)$/, m=>{
+                    messageInput.setValue(`\\${RegExp.$1} `);
+                    screen.render();
+                })
+                break;
             default:
-            if(msg.length > 0){
-                events.onSubmit(msg);
-            }
-            messageInput.clearValue();
-            break;
+                if (msg.length > 0) {
+                    events.onSubmit(msg);
+                }
+                messageInput.clearValue();
+                break;
         }
     });
 
@@ -172,34 +179,29 @@ module.exports = info=>{
     screen.render();
     screen.focusPush(messageInput);
 
-    function addMessage(sender, message){
+    function addMessage(sender, message) {
         messageView.setScrollPerc(100);
-        if(sender){
+        if (sender) {
             messageView.pushLine(`${sender}: ${message}`);
         }
-        else{
+        else {
             messageView.pushLine(`${message}`);
         }
         messageView.setScrollPerc(100);
         screen.render();
     }
 
-    function setMembers(members){
+    function setMembers(members) {
         sidebar.setContent("");
-        members.forEach(item=>{
+        members.forEach(item => {
             sidebar.pushLine(item);
         });
         screen.render();
     }
 
-    function log(txt){
-        screen.log(txt);
-    }
-
     return {
         addMessage: addMessage,
         setMembers: setMembers,
-        log: log,
         events: events
     }
 }

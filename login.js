@@ -1,16 +1,16 @@
 const blessed = require('blessed');
-const program = blessed.program();
 const jsondb = require("./jsondb.js");
-const db = new jsondb("cache.json", {});
+const path = require("path");
 
-module.exports = ()=>{
+module.exports = () => {
+    
+    const db = new jsondb(path.join(process.env.USERPROFILE || process.env.HOME, ".chat.json"), {});
     const cache = db.read();
-    const events = {
-        onSubmit: function(server, channel, name){}
-    }
-
-    const screen = blessed.screen({smartCSR: true});
+    const screen = blessed.screen({ smartCSR: true });
     const program = blessed.program();
+    const events = {
+        onSubmit: function (server, channel, name) { }
+    }
 
     const background = blessed.box({
         top: 0,
@@ -32,7 +32,7 @@ module.exports = ()=>{
         top: "center",
         left: "center",
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         }
     });
@@ -42,7 +42,7 @@ module.exports = ()=>{
         content: "{bold}Server:{/}",
         top: 1,
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         }
     });
@@ -56,11 +56,11 @@ module.exports = ()=>{
         top: 0,
         border: {
             type: "line",
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         },
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         }
     });
@@ -70,7 +70,7 @@ module.exports = ()=>{
         content: "{bold}Channel:{/}",
         top: 5,
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         }
     });
@@ -84,11 +84,11 @@ module.exports = ()=>{
         top: 4,
         border: {
             type: "line",
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         },
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         }
     });
@@ -98,7 +98,7 @@ module.exports = ()=>{
         content: "{bold}Name:{/}",
         top: 9,
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         }
     });
@@ -112,29 +112,12 @@ module.exports = ()=>{
         top: 8,
         border: {
             type: "line",
-            bg: "#333333",
+            bg: "black",
             fg: "white"
         },
         style: {
-            bg: "#333333",
+            bg: "black",
             fg: "white"
-        }
-    });
-
-    const alertBox = blessed.box({
-        tags: true,
-        hidden: true,
-        width: 54,
-        shaddow: true,
-        height: 3,
-        top: "center",
-        left: "center",
-        border: {
-            type: "bg",
-            bg: "#400000"
-        },
-        style: {
-            bg: "#400000"
         }
     });
 
@@ -146,15 +129,35 @@ module.exports = ()=>{
         width: 10
     });
 
-    if(cache.server){
+    const alertBox = blessed.box({
+        hidden: true,
+        shaddow: true,
+        height: 3,
+        top: "center",
+        left: 0,
+        right: 0,
+        align: "center",
+        border: {
+            type: "bg",
+            bg: "red"
+        },
+        style: {
+            bg: "red",
+            fg: "white"
+        }
+    });
+
+    if (cache.server) {
         inputServer.setValue(cache.server);
     }
-    if(cache.channel){
+    if (cache.channel) {
         inputChannel.setValue(cache.channel);
     }
-    if(cache.name){
+    if (cache.name) {
         inputName.setValue(cache.name);
     }
+
+    screen.enableMouse();
     screen.append(background);
     loginForm.append(lblServer);
     loginForm.append(inputServer);
@@ -163,54 +166,54 @@ module.exports = ()=>{
     loginForm.append(lblName);
     loginForm.append(inputName);
     screen.append(loginForm);
-    screen.append(alertBox);
     screen.append(loading);
-    program.enableMouse();
+    screen.append(alertBox);
     screen.render();
     screen.focusPush(inputServer);
-
-    screen.key('C-c', (ch, key)=>{
-        process.exit(0);
-    });
-
-    screen.key("enter", ()=>{
+    inputServer.key("enter", enter);
+    inputChannel.key("enter", enter);
+    inputName.key("enter", enter);
+    screen.key('C-c', process.exit);
+    inputServer.key("C-c", process.exit);
+    inputChannel.key("C-c", process.exit);
+    inputName.key("C-c", process.exit);
+    alertBox.key("enter", () => {
         alertBox.hide();
+        screen.render();
+        screen.focusPush(inputServer);
     });
 
-    inputServer.key("enter", ()=>{
-        enter();
-    });
-    inputChannel.key("enter", ()=>{
-        enter();
-    });
-    inputName.key("enter", ()=>{
-        enter();
-    });
-
-    function showAlert(text){
+    function showAlert(text) {
+        alertBox.setContent(`${text} [ENTER]`);
         alertBox.show();
-        alertBox.setContent(`{#ffaaaa-fg}${text}{/} [ENTER]`);
+        alertBox.setFront();
         alertBox.focus();
+        screen.render();
     }
 
-    function enter(){
-        loading.show();
+    function showLoading() {
         loading.load("Loading...");
+        loading.setFront();
+        screen.render();
+    }
+
+    function enter() {
         let server = inputServer.getValue().trim();
         let channel = inputChannel.getValue().trim();
         let name = inputName.getValue().trim();
-        if(!/^(http|https):\/\/.*$/.test(server)){
+        if (!/^(http|https):\/\/.+$/.test(server)) {
             showAlert("Invalid server URL!");
         }
-        else if(channel.length < 8){
+        else if (channel.length < 8) {
             showAlert("The channel must be at least 8 characters!");
         }
-        else if(name == ""){
+        else if (name == "") {
             showAlert("The name is required!");
         }
-        else{
+        else {
+            showLoading();
             events.onSubmit(server, channel, name);
-            db.write((obj)=>{
+            db.write((obj) => {
                 return {
                     server: server,
                     channel: channel,

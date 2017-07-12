@@ -1,6 +1,6 @@
 {
     "name": "crypto-chat",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Encrypted chat via terminal",
     "main": "index.js",
     "scripts": {
@@ -25,9 +25,9 @@
     },
     "homepage": "https://github.com/samuelnovaes/crypto-chat#readme",
     "dependencies": {
-        "blessed": "^0.1.81",
-        "socket.io": "^1.7.2",
-        "socket.io-client": "^1.7.2"
+        "blessed": "*",
+        "socket.io": "*",
+        "socket.io-client": "*"
     },
     "bin": {
         "crypto-chat": "index.js"
