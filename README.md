@@ -23,8 +23,8 @@ crypto-chat
 - Use the arrow keys or TAB to switch field in the login form
 - Press ENTER to submit the login form
 - Write a message in the message field and press ENTER to send the message
-- UP and DOWN keys scrolls the message view
-- Ctrl + UP and Ctrl + DOWN scrolls the members list
+- Press UP and DOWN keys to scroll the message view
+- Press Ctrl + UP and Ctrl + DOWN to scroll the members list
 
 # Chat commands
 - \quit : Quit the chat

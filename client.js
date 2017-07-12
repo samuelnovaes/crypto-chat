@@ -32,19 +32,19 @@ module.exports = function(){
         socket.emit("enter", hash(channel), encrypt(name, channel));
         socket.on("ready", mid=>{
             login.exit();
-            const display = require("./display.js")(`{bold}Server:{/} ${server} - {bold}Channel:{/} ${channel} - {bold}Name:{/} ${name}`);
+            const display = require("./display.js")(`{bold}Server:{/bold} ${server} - {bold}Channel:{/bold} ${channel} - {bold}Name:{/bold} ${name}`);
             socket.emit("members");
             display.events.onSubmit = (msg)=>{
                 socket.emit("message", encrypt(msg, channel));
-            }
+            };
             display.events.onPrivate = (id, msg)=>{
                 socket.emit("private", encrypt(msg, channel), id)
-            }
-            socket.on("me", (message, priv)=>{
+            };
+            socket.on("me", (message, color, priv)=>{
                 message =  decrypt(message, channel);
                 let nam;
                 if(priv){
-                    nam = `{bold}${name} > {${priv.color}-fg}${decrypt(priv.name, channel)}{/${priv.color}-fg}{/bold}`;
+                    nam = `{bold}${name} > {${color}-fg}${decrypt(priv, channel)}{/${color}-fg}{/bold}`;
                 }
                 else{
                     nam = `{bold}${name}{/bold}`;
@@ -57,7 +57,7 @@ module.exports = function(){
                 from = decrypt(from, channel);
                 if(from && from != ""){
                     if(info){
-                        display.addMessage(null, `{bold}${from}{/} ${info} the chat`, color);
+                        display.addMessage(null, `{bold}{${color}-fg}${from}{/${color}-fg}{/bold} ${info} the chat`, color);
                         socket.emit("members");
                     }
                     else{
@@ -86,7 +86,7 @@ module.exports = function(){
                             data[i].color = "white";
                         }
                         let nam = decrypt(data[i].name, channel);
-                        let content = `${i} {bold}{${data[i].color}-fg}${nam}{/}`;
+                        let content = `${i} {bold}{${data[i].color}-fg}${nam}{/${data[i].color}-fg}{/bold}`;
                         members.push(content);
                     }
                 }

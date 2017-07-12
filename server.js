@@ -19,7 +19,7 @@ module.exports = function (port) {
                 nam = name;
                 db[channel][id] = { name: name, color: color };
                 db[channel].n++;
-                socket.broadcast.emit(channel, name, null, "white", "joined");
+                socket.broadcast.emit(channel, name, null, color, "joined");
                 socket.emit("ready", id);
             }
         });
@@ -32,24 +32,31 @@ module.exports = function (port) {
             }
         });
         socket.on("disconnect", () => {
+            let color = db[ch][id].color;
             delete db[ch][id];
             db[ch].n--;
             if (db[ch].n == 0) {
                 delete db[ch];
             }
-            socket.broadcast.emit(ch, nam, null, "white", "exited", null);
+            socket.broadcast.emit(ch, nam, null, color, "exited", null);
         });
         socket.on("message", message => {
             if (typeof message == "string" && message.length > 0) {
                 socket.broadcast.emit(ch, nam, message, color, null, null);
-                socket.emit("me", message);
+                socket.emit("me", message, "white");
             }
         });
         socket.on("private", (message, to) => {
             if (typeof message == "string" && typeof to == "number" && message.length > 0 && db[ch][to]) {
-                privates[++lastPrivate] = { channel: ch, from: id, to: to, message: message };
-                socket.broadcast.emit("newPrivate");
-                socket.emit("me", message, db[ch][to]);
+                let color = db[ch][to].color;
+                if (to != id) {
+                    privates[++lastPrivate] = { channel: ch, from: id, to: to, message: message };
+                    socket.broadcast.emit("newPrivate");
+                }
+                else {
+                    color = "white";
+                }
+                socket.emit("me", message, color, db[ch][to].name);
             }
         });
         socket.on("members", () => {
