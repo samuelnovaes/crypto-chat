@@ -33,3 +33,9 @@ crypto-chat
 - \show : Show the sidebar
 - \size-n : Where n is a number - Resize the sidebar
 - \n message : Where n is a number - Send private message to user with  id n
+
+# Screenshots
+
+![Crypto Chat Login](https://raw.githubusercontent.com/samuelnovaes/crypto-chat/master/pics/login.png)
+
+![Crypto Chat](https://raw.githubusercontent.com/samuelnovaes/crypto-chat/master/pics/chat.png)
