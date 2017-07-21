@@ -1,7 +1,7 @@
 # Cripto chat
 Encrypted chat via terminal
 
-[![NPM](https://nodei.co/npm/phaser-runtime.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/crypto-chat/)
+[![NPM](https://nodei.co/npm/crypto-chat.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/crypto-chat/)
 
 # Screenshots
 
